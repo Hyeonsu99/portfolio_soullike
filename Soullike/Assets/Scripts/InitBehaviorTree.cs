@@ -11,7 +11,7 @@ public class InitBehaviorTree
         _rootNode = rootNode;
     }
 
-    public void Start()
+    public void StartBehaviorTree()
     {
         _rootNode.Evaulate();
     }
