@@ -9,18 +9,8 @@ public class PlayerController : MonoBehaviour
 
     private float _moveSpeed = 2f;
 
-    private CameraController _CamController;
-
-    private Vector3 _defaultCamPosition = new Vector3(0, 3, -2);
-    private Quaternion _defaultCamRotation = Quaternion.Euler(25, 0, 0);
-
-    private Vector3 _aimCamPosition = new Vector3(0.5f, 1.5f, -1);
-    private Quaternion _aimCamRotation = Quaternion.Euler(Vector3.zero);
-
-    [SerializeField]
-    private Transform _defalutCamOffset;
-    [SerializeField]
-    private Transform _aimCamOffset;
+    public GameObject freeLookCam;
+    public GameObject aimingCam;
 
     // Start is called before the first frame update
     void Start()
@@ -29,16 +19,13 @@ public class PlayerController : MonoBehaviour
 
         _animator = GetComponentInChildren<Animator>();
 
-        _CamController = Camera.main.GetComponent<CameraController>();
-
-
+        freeLookCam.SetActive(true);
+        aimingCam.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        _CamController.target = transform;
-
         Move(_inputController.moveInput);
 
         Aiming();
@@ -87,14 +74,15 @@ public class PlayerController : MonoBehaviour
     {
         if(_inputController.isAiming)
         {
-            _CamController.positionOffset = _aimCamPosition;
-            _CamController.rotationOffset = _aimCamRotation;
+            freeLookCam.SetActive(false);
+            aimingCam.SetActive(true);
         }
         else
         {
-            _CamController.positionOffset = _defaultCamPosition;
-            _CamController.rotationOffset = _defaultCamRotation;
+            freeLookCam.SetActive(true);
+            aimingCam.SetActive(false);
         }
+
     }
 
     private void Fire()

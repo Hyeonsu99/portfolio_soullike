@@ -25,6 +25,7 @@ public class PlayerInputController : MonoBehaviour
 
         isFire = Input.GetButtonDown("Fire1");
         isAiming = Input.GetButton("Fire2");
-        isRolling = Input.GetButtonDown("Jump");
+
+        isRolling = Input.GetKeyDown(KeyCode.LeftControl);
     }
 }
