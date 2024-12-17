@@ -18,7 +18,7 @@ public class ConditionNode : INode
         {
             return INode.NodeState.Failure;
         }
-
+        
         return condition.Invoke() ? INode.NodeState.Success : INode.NodeState.Failure;
     }
 }

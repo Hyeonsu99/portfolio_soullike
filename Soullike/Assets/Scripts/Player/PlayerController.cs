@@ -99,11 +99,11 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
-        Debug.Log(_inputController.isFire);
+
     }
 
     private void Rolling()
     {
-        Debug.Log(_inputController.isRolling);
+
     } 
 }
