@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private Animator _animator;
 
     private float _moveSpeed = 2.0f;
+    private Quaternion _lastRotation;
 
     public GameObject freeLookCameraTarget;
     public GameObject aimCameraTarget;
@@ -28,6 +29,8 @@ public class PlayerController : MonoBehaviour
     private GameObject _aimCam;
 
     private bool _isReadyCam = false;
+
+    [SerializeField] private GameObject _bullet;
 
     // Start is called before the first frame update
     void Start()
@@ -59,12 +62,12 @@ public class PlayerController : MonoBehaviour
     {
         _mouseVector = _inputController.mouseInput;
 
-        Move(_inputController.moveInput);
-
         Rolling();
 
         if(_isReadyCam)
         {
+            Move(_inputController.moveInput);
+
             Aiming();
 
             if(_inputController.isFire)
@@ -76,20 +79,15 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_inputController.isLock == false)
-        {
-            FreeLookCamRotate();
-        }
-        else
-        {
-            Quaternion smoothRot = Quaternion.Slerp(freeLookCameraTarget.transform.rotation, Quaternion.Euler(Vector3.zero), 30f * Time.deltaTime);
-
-            freeLookCameraTarget.transform.rotation = smoothRot;
-        }
-
         if (_inputController.isAiming)
         {
             AimCamRotate();
+
+            freeLookCameraTarget.transform.rotation = Quaternion.Euler(Vector3.zero);
+        }
+        else
+        {
+            FreeLookCamRotate();
         }
     }
 
@@ -117,53 +115,45 @@ public class PlayerController : MonoBehaviour
 
     private void Move(Vector2 moveInput)
     {
-        if (_freeLookCam.activeInHierarchy)
+        if(_freeLookCam.activeInHierarchy)
         {
-            Vector3 inputVec = new Vector3(moveInput.x, 0, moveInput.y);
-
-            if (moveInput.sqrMagnitude > 0)
+            if (moveInput.sqrMagnitude > 0f)
             {
-                Vector3 moveVec = Vector3.forward * _moveSpeed * Time.deltaTime;
+                Vector3 lookForward = new Vector3(freeLookCameraTarget.transform.forward.x, 0f, freeLookCameraTarget.transform.forward.z).normalized;
+                Vector3 lookRight = new Vector3(freeLookCameraTarget.transform.right.x, 0f, freeLookCameraTarget.transform.right.z).normalized;
 
-                Vector3 normalVec = inputVec.normalized;
-                Quaternion rot = Quaternion.identity;
+                Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
 
-                rot.eulerAngles = new Vector3(0, Mathf.Atan2(normalVec.x, normalVec.z) * Mathf.Rad2Deg, 0);
+                Quaternion viewRot = Quaternion.LookRotation(moveDir.normalized);
 
-                transform.Translate(moveVec);
+                transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
 
-                transform.rotation = Quaternion.Slerp(transform.rotation, rot, 5f * Time.deltaTime);
+                _lastRotation = transform.rotation;
+
+                transform.position += moveDir * _moveSpeed * Time.deltaTime;
             }
-
+            else
+            {
+                transform.rotation = _lastRotation;
+            }
         }
-        //if(_freeLookCam.activeInHierarchy)
-        //{
-        //    Vector3 lookForward = new Vector3(freeLookCameraTarget.transform.forward.x, 0f, freeLookCameraTarget.transform.forward.z).normalized;
-        //    Vector3 lookRight = new Vector3(freeLookCameraTarget.transform.right.x, 0f, freeLookCameraTarget.transform.right.z).normalized;
-
-        //    Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
-
-        //    Quaternion viewRot = Quaternion.LookRotation(moveDir.normalized);
-
-        //    transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
-
-        //    transform.position += moveDir * _moveSpeed * Time.deltaTime;
-        //}
         else if(_aimCam.activeInHierarchy)
         {
-            Vector3 lookForward = new Vector3(aimCameraTarget.transform.forward.x, 0f, aimCameraTarget.transform.forward.z).normalized;
-            Vector3 lookRight = new Vector3(aimCameraTarget.transform.right.x, 0f, aimCameraTarget.transform.right.z).normalized;
 
-            Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
+            if(moveInput.sqrMagnitude > 0f)
+            {
+                Vector3 lookForward = new Vector3(aimCameraTarget.transform.forward.x, 0f, aimCameraTarget.transform.forward.z).normalized;
+                Vector3 lookRight = new Vector3(aimCameraTarget.transform.right.x, 0f, aimCameraTarget.transform.right.z).normalized;
 
-            Quaternion viewRot = Quaternion.LookRotation(moveDir.normalized);
+                Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
 
-            transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
+                Quaternion viewRot = Quaternion.LookRotation(moveDir.normalized);
 
-            _aimCameraTargetPitch = Mathf.Round(_aimCameraTargetPitch * 10) / 10.0f;
-            _aimCameraTargetYaw = Mathf.Round(_aimCameraTargetYaw * 10) / 10.0f;
+                transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
 
-            transform.Translate(moveDir * _moveSpeed * 0.5f * Time.deltaTime);
+                transform.Translate(moveDir * _moveSpeed * 0.5f * Time.deltaTime);
+            }
+
         }
     }
 
@@ -174,15 +164,11 @@ public class PlayerController : MonoBehaviour
             _freeLookCam.SetActive(false);
             _aimCam.SetActive(true);
 
-            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            //transform.LookAt(new Vector3(ray.GetPoint(10f).x, 0f, ray.GetPoint(10f).z));
+            Quaternion viewRot = Quaternion.LookRotation(new Vector3(ray.GetPoint(10f).x, 0f, ray.GetPoint(10f).z));
 
-            Vector3 aimDirection = aimCameraTarget.transform.forward;
-
-            aimDirection.y = 0f;
-
-            transform.rotation = Quaternion.LookRotation(aimDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
         }
         else
         {
@@ -223,9 +209,6 @@ public class PlayerController : MonoBehaviour
         _aimCameraTargetYaw = ClampAngle(_aimCameraTargetYaw, float.MinValue, float.MaxValue);
         _aimCameraTargetPitch = ClampAngle(_aimCameraTargetPitch, -10, 30);
 
-        _aimCameraTargetPitch = Mathf.Round(_aimCameraTargetPitch * 10) / 10.0f;
-        _aimCameraTargetYaw = Mathf.Round(_aimCameraTargetYaw * 10) / 10.0f;
-
         aimCameraTarget.transform.rotation = Quaternion.Euler(_aimCameraTargetPitch + _cameraAngleOverride, _aimCameraTargetYaw, 0.0f);
     }
 
@@ -248,7 +231,9 @@ public class PlayerController : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        Debug.DrawRay(aimCameraTarget.transform.position, ray.GetPoint(10f), Color.red, Mathf.Infinity);
+        Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
+
+        Instantiate(_bullet, _aimCam.transform);
     }
 
     private void Rolling()
