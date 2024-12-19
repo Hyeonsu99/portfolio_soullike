@@ -38,6 +38,9 @@ public class PlayerController : MonoBehaviour
         _freeLookCameraTargetYaw = freeLookCameraTarget.transform.rotation.eulerAngles.y;
         _aimCameraTargetYaw = aimCameraTarget.transform.rotation.eulerAngles.y;
 
+        _freeLookCameraTargetYaw = 0f;
+        _freeLookCameraTargetPitch = 0f;
+
         _inputController = GetComponent<PlayerInputController>();
 
         _animator = GetComponentInChildren<Animator>();
@@ -166,9 +169,14 @@ public class PlayerController : MonoBehaviour
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            Quaternion viewRot = Quaternion.LookRotation(new Vector3(ray.GetPoint(10f).x, 0f, ray.GetPoint(10f).z));
+            Quaternion viewRot = Quaternion.LookRotation(new Vector3(ray.direction.x, 0f, ray.direction.z));
 
             transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
+
+            _freeLookCameraTargetPitch = _aimCameraTargetPitch;
+            _freeLookCameraTargetYaw = _aimCameraTargetYaw;
+
+            _lastRotation = transform.rotation;
         }
         else
         {
