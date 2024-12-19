@@ -14,6 +14,9 @@ public class ParallelNode : INode
 
     public INode.NodeState Evaulate()
     {
+        bool _isAnyNodeRunning = false;
+        bool _isAllNodeSuccess = false;
+
         if (_child == null || _child.Count == 0)
         {
             return INode.NodeState.Failure;
@@ -21,9 +24,27 @@ public class ParallelNode : INode
 
         foreach(var node in _child)
         {
-            node.Evaulate();
+            var state = node.Evaulate();
+
+            if(state == INode.NodeState.Running)
+            {
+                _isAnyNodeRunning = true;
+            }
+            else if(state == INode.NodeState.Failure)
+            {
+                _isAllNodeSuccess = false;
+            }
         }
 
-        return INode.NodeState.Running;
+        if(_isAllNodeSuccess)
+        {
+            return INode.NodeState.Success;
+        }
+        if(_isAnyNodeRunning)
+        {
+            return INode.NodeState.Running;
+        }
+
+        return INode.NodeState.Failure;
     }
 }

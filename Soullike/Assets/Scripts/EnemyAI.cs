@@ -43,78 +43,54 @@ public class EnemyAI : MonoBehaviour
                     (
                         new List<INode>()
                         {
-                            new ActionNode(CheckingPlayerInDetectionRange),
-                            new ActionNode(Chase),
-                            //new ConditionNode(CheckAttackRange),
-                            //new ActionNode(Attack)
+                            new ActionNode(Action2),
+
+                            new ParallelNode
+                            (
+                                new List<INode>()
+                                {
+                                    new ActionNode(Action3),
+                                    new ActionNode(Action1)
+                                }
+                            )
                         }
                     )
                 }
             );
     }
 
-    INode.NodeState CheckingPlayerInDetectionRange()
+    INode.NodeState Action1()
     {
-        var targets = Physics.OverlapSphere(transform.position, _detectionRange, layerMask);
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        Debug.Log("추적 중...");
-
-        if (targets != null && targets.Length > 0)
-        {
-            _target = targets[0].transform;
-
-            Debug.Log("추적 끝...");
-
-            return INode.NodeState.Success;
-        }
-
-        _target = null;
-        return INode.NodeState.Failure;
-    }
-
-    bool CheckDetectionRange()
-    {
-        var targets = Physics.OverlapSphere(transform.position, _detectionRange, layerMask);
-
-        if (targets != null && targets.Length > 0)
-        {
-            _target = targets[0].transform;
-
-            return true;
-        }
-
-        _target = null;
-        return false;
-    }
-
-    INode.NodeState Chase()
-    {
-        if (_target != null)
-        {
-            if (Vector3.Distance(_target.position, transform.position) > _attackRange)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, _target.position, Time.deltaTime);
-
-                return INode.NodeState.Running;
-            }
-            else
-            {
-                return INode.NodeState.Success;
-            }
-        }
-
-        return INode.NodeState.Failure;
-    }
-
-    bool CheckAttackRange()
-    {
-        return false;
-    }
-
-    INode.NodeState Attack()
-    {
         return INode.NodeState.Success;
     }
+
+    INode.NodeState Action2()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        return INode.NodeState.Success;
+    }
+    INode.NodeState Action3()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        return INode.NodeState.Failure;
+    }
+    INode.NodeState Action4()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        return INode.NodeState.Running;
+    }
+    INode.NodeState Action5()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        return INode.NodeState.Success;
+    }
+
 
     private void OnDrawGizmos()
     {
