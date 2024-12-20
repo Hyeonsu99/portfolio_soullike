@@ -12,7 +12,7 @@ public class GameManager : Singletone<GameManager>
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Confined;
+        
     }
 
     private void ChangeCursorState(CursorLockMode mode)

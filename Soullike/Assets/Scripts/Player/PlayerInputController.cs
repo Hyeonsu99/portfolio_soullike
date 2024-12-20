@@ -32,6 +32,6 @@ public class PlayerInputController : MonoBehaviour
 
         isRolling = Input.GetKeyDown(KeyCode.LeftControl);
 
-        isLock = !Input.GetKey(KeyCode.LeftAlt);
+        isLock = Input.GetKey(KeyCode.LeftAlt);
     }
 }

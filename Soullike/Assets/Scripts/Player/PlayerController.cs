@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,6 +8,8 @@ public class PlayerController : MonoBehaviour
     private PlayerInputController _inputController;
     private Animator _animator;
 
+    [SerializeField]
+    [Range(0f , 20f)]
     private float _moveSpeed = 2.0f;
     private Quaternion _lastRotation;
 
@@ -19,9 +22,12 @@ public class PlayerController : MonoBehaviour
     private float _aimCameraTargetYaw;
     private float _aimCameraTargetPitch;
 
-    private float _topClamp = 70.0f;
-    private float _bottomClamp = -30.0f;
+    private float _freeLookCamtopClamp = 70.0f;
+    private float _freeLookCambottomClamp = -30.0f;
     private float _cameraAngleOverride = 0.0f;
+
+    private float _aimCamTopClamp = -10f;
+    private float _aimCamBottomClamp = 30f;
 
     private Vector2 _mouseVector;
 
@@ -65,8 +71,6 @@ public class PlayerController : MonoBehaviour
     {
         _mouseVector = _inputController.mouseInput;
 
-        Rolling();
-
         if(_isReadyCam)
         {
             Move(_inputController.moveInput);
@@ -77,7 +81,9 @@ public class PlayerController : MonoBehaviour
             {
                 Fire();
             }
-        }       
+        }
+
+        Rolling();
     }
 
     private void LateUpdate()
@@ -92,11 +98,6 @@ public class PlayerController : MonoBehaviour
         {
             FreeLookCamRotate();
         }
-    }
-
-    private void FixedUpdate()
-    {
-
     }
 
     // 지속적으로 업데이트 되는 애니메이션에는 사용 불가능
@@ -128,11 +129,18 @@ public class PlayerController : MonoBehaviour
                 Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
 
                 Quaternion viewRot = Quaternion.LookRotation(moveDir.normalized);
+              
+                if(_inputController.isLock)
+                {
+                    transform.rotation = _lastRotation;
+                }
+                else
+                {
+                    _lastRotation = transform.rotation;
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
-
-                _lastRotation = transform.rotation;
-
+                    transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
+                }
+                
                 transform.position += moveDir * _moveSpeed * Time.deltaTime;
             }
             else
@@ -198,7 +206,7 @@ public class PlayerController : MonoBehaviour
         }
 
         _freeLookCameraTargetYaw = ClampAngle(_freeLookCameraTargetYaw, float.MinValue, float.MaxValue);
-        _freeLookCameraTargetPitch = ClampAngle(_freeLookCameraTargetPitch, _bottomClamp, _topClamp);
+        _freeLookCameraTargetPitch = ClampAngle(_freeLookCameraTargetPitch, _freeLookCambottomClamp, _freeLookCamtopClamp);
 
         freeLookCameraTarget.transform.rotation = Quaternion.Euler(_freeLookCameraTargetPitch + _cameraAngleOverride, _freeLookCameraTargetYaw, 0.0f);
     }
@@ -241,7 +249,9 @@ public class PlayerController : MonoBehaviour
 
         Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
 
-        Instantiate(_bullet, _aimCam.transform);
+        var obj = ObjectPool.GetObject();
+
+        obj.GetComponent<Bullet>().firePoint = _aimCam.transform;
     }
 
     private void Rolling()
