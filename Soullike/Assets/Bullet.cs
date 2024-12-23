@@ -6,21 +6,12 @@ public class Bullet : MonoBehaviour
 {
     public Transform firePoint;
 
-    Vector3 dir;
-
-    Ray ray;
+    public Vector3 dir;
 
     public const string DESTROY_THIS_NAME = "Destroythis";
 
-    // Start is called before the first frame update
-    void Start()
+    public void ReturnBullet()
     {
-        transform.position = firePoint.position;
-
-        dir = Camera.main.ScreenPointToRay(Input.mousePosition).direction;
-
-        ray = new Ray(firePoint.position, dir);
-
         Invoke(DESTROY_THIS_NAME, 5f);
     }
 
@@ -29,8 +20,13 @@ public class Bullet : MonoBehaviour
         ObjectPool.ReturnObject(gameObject);
     }
 
+    private void OnDisable()
+    {
+        transform.position = firePoint.position;
+    }
+
     private void Update()
     {
-        transform.position += ray.direction * 50f * Time.deltaTime;
+        transform.position += dir * 50f * Time.deltaTime;
     }
 }

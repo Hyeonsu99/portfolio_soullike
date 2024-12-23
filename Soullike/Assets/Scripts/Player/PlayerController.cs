@@ -26,8 +26,8 @@ public class PlayerController : MonoBehaviour
     private float _freeLookCambottomClamp = -30.0f;
     private float _cameraAngleOverride = 0.0f;
 
-    private float _aimCamTopClamp = -10f;
-    private float _aimCamBottomClamp = 30f;
+    private float _aimCamTopClamp = 20f;
+    private float _aimCamBottomClamp = -20f;
 
     private Vector2 _mouseVector;
 
@@ -76,14 +76,18 @@ public class PlayerController : MonoBehaviour
             Move(_inputController.moveInput);
 
             Aiming();
-
-            if(_inputController.isFire)
-            {
-                Fire();
-            }
         }
 
-        Rolling();
+        // 차후 총기 추가 및 애니메이션 추가되면 수정
+        if(Input.GetMouseButtonDown(0) && _inputController.isAiming)
+        {
+            Fire();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Rolling();
+        }
     }
 
     private void LateUpdate()
@@ -223,7 +227,7 @@ public class PlayerController : MonoBehaviour
             _aimCameraTargetPitch += _mouseVector.y * deltaTimeMultiplier;
         }
         _aimCameraTargetYaw = ClampAngle(_aimCameraTargetYaw, float.MinValue, float.MaxValue);
-        _aimCameraTargetPitch = ClampAngle(_aimCameraTargetPitch, -10, 30);
+        _aimCameraTargetPitch = ClampAngle(_aimCameraTargetPitch, _aimCamBottomClamp, _aimCamTopClamp);
 
         aimCameraTarget.transform.rotation = Quaternion.Euler(_aimCameraTargetPitch + _cameraAngleOverride, _aimCameraTargetYaw, 0.0f);
     }
@@ -251,7 +255,12 @@ public class PlayerController : MonoBehaviour
 
         var obj = ObjectPool.GetObject();
 
-        obj.GetComponent<Bullet>().firePoint = _aimCam.transform;
+        var spawnedBullet = obj.GetComponent<Bullet>();
+
+        spawnedBullet.transform.position = _aimCam.transform.position;
+        spawnedBullet.dir = ray.direction;
+        spawnedBullet.firePoint = _aimCam.transform;
+        spawnedBullet.ReturnBullet();
     }
 
     private void Rolling()

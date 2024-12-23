@@ -8,12 +8,11 @@ public class PlayerInputController : MonoBehaviour
 
     public Vector2 mouseInput;
 
+    public Vector2 mousePosition;
+
     public bool isLock;
 
-    public bool isRolling;
-    public bool isFire;
     public bool isAiming;
-
 
     // Start is called before the first frame update
     void Start()
@@ -27,10 +26,9 @@ public class PlayerInputController : MonoBehaviour
         moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         mouseInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-        isFire = Input.GetButtonDown("Fire1");
-        isAiming = Input.GetButton("Fire2");
+        mousePosition = Input.mousePosition;
 
-        isRolling = Input.GetKeyDown(KeyCode.LeftControl);
+        isAiming = Input.GetButton("Fire2");
 
         isLock = Input.GetKey(KeyCode.LeftAlt);
     }

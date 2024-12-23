@@ -1506,7 +1506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 244d260b27356704b9ac40e3a596c5f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poolingObjectPrefab: {fileID: 2201270987240400616, guid: b9b98bafb150b1d48bd9561547479739,
+  poolingObjectPrefab: {fileID: 7488927578596224452, guid: da8a5810fc283c247bfea08134afcaa2,
     type: 3}
 --- !u!4 &1351772596
 Transform:
