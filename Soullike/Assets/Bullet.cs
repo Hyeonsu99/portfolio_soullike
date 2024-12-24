@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour
 
     public const string DESTROY_THIS_NAME = "Destroythis";
 
+
     public void ReturnBullet()
     {
         Invoke(DESTROY_THIS_NAME, 5f);
@@ -18,11 +19,6 @@ public class Bullet : MonoBehaviour
     private void Destroythis()
     {
         ObjectPool.ReturnObject(gameObject);
-    }
-
-    private void OnDisable()
-    {
-        transform.position = firePoint.position;
     }
 
     private void Update()

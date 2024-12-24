@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
     private float _detectionRange = 25;
     private float _attackRange = 3;
+
+    private NavMeshAgent _agent;
 
     public Transform _target;
 
@@ -13,10 +16,19 @@ public class EnemyAI : MonoBehaviour
 
     InitBehaviorTree _initBehaviorTree;
 
+    private float _patternTime = 0.0f;
+
+    private void Awake()
+    {
+        _initBehaviorTree = new InitBehaviorTree(SettingBT());
+
+        _agent = GetComponent<NavMeshAgent>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        _initBehaviorTree = new InitBehaviorTree(SettingBT());
+        
     }
 
     // Update is called once per frame
@@ -44,7 +56,8 @@ public class EnemyAI : MonoBehaviour
                         new List<INode>()
                         {
                             new ActionNode(CheckEnemyInDetectionRange),
-                            new ParallelNode
+                            new ActionNode(Chase),
+                            new SequenceNode
                             (
                                 new List<INode>()
                                 {
@@ -57,14 +70,16 @@ public class EnemyAI : MonoBehaviour
                                         }
                                     ),
 
-                                    new ActionNode(Chase)
+                                    new ActionNode(CheckPatternTime)
                                 }
+
+
                             )
                         }
                     ),
 
                 }
-            );
+            ); ;
     }
 
     INode.NodeState CheckEnemyInDetectionRange()
@@ -108,29 +123,58 @@ public class EnemyAI : MonoBehaviour
 
     INode.NodeState Chase()
     {
-        Debug.Log("추적 중..");
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        if (Vector3.Distance(transform.position, _target.position) < _attackRange)
+        if (Vector3.Distance(transform.position, _target.position) <= _attackRange)
         {
+            _agent.speed = 0f;
+
             Debug.Log("추적 종료");
 
             return INode.NodeState.Success;
         }
 
+        if(_target == null)
+        {
+            return INode.NodeState.Failure;
+        }
 
         transform.LookAt(new Vector3(_target.position.x, transform.position.y, _target.position.z));
 
-        transform.Translate(Vector3.forward * 1f * Time.deltaTime);
+        _agent.destination = _target.position;
+        _agent.speed = 2f;
 
         return INode.NodeState.Running;
     }
 
-    INode.NodeState Action1()
+    INode.NodeState CheckPatternTime()
     {
-        Debug.Log("다른 액션도 실행 중");
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        return INode.NodeState.Success;
+        _patternTime += Time.deltaTime;
+
+        if(_patternTime >= 3f)
+        {
+            _patternTime = 0;
+
+            StartCoroutine(PatternCoroutine());
+
+            return INode.NodeState.Success;
+        }
+
+        return INode.NodeState.Failure;
     }
+
+    private IEnumerator PatternCoroutine()
+    {
+        Debug.Log("패턴 코루틴 시작");
+
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("패턴 코루틴 끝");
+    }
+
+
 
     private void OnDrawGizmos()
     {

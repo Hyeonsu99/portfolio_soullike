@@ -36,8 +36,6 @@ public class PlayerController : MonoBehaviour
 
     private bool _isReadyCam = false;
 
-    [SerializeField] private GameObject _bullet;
-
     // Start is called before the first frame update
     void Start()
     {
