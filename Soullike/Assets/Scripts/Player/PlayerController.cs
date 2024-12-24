@@ -251,13 +251,13 @@ public class PlayerController : MonoBehaviour
 
         Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
 
-        var obj = ObjectPool.GetObject();
+        var obj = ObjectPool.GetObject(ObjectPool.instance.bulletObjectQueue , ObjectPool.instance.bulletObjectPrefab);
 
         var spawnedBullet = obj.GetComponent<Bullet>();
 
         spawnedBullet.transform.position = _aimCam.transform.position;
         spawnedBullet.dir = ray.direction;
-        spawnedBullet.firePoint = _aimCam.transform;
+        spawnedBullet.firePoint = _aimCam.transform; 
         spawnedBullet.ReturnBullet();
     }
 

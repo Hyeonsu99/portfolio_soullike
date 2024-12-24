@@ -16,7 +16,10 @@ public class EnemyAI : MonoBehaviour
 
     InitBehaviorTree _initBehaviorTree;
 
-    private float _patternTime = 0.0f;
+    private float _bombPatternTime = 0.0f;
+    private float _rushPatternTime = 0.0f;
+
+    public Transform[] bombPoints;
 
     private void Awake()
     {
@@ -25,24 +28,10 @@ public class EnemyAI : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
-        _initBehaviorTree.StartBehaviorTree();
-
-        //var targets = Physics.OverlapSphere(transform.position, _detectionRange, layerMask);
-
-        //if (targets != null && targets.Length > 0)
-        //{
-        //    _target = targets[0].transform;
-        //}
-            
+        _initBehaviorTree.StartBehaviorTree();          
     }
 
     INode SettingBT()
@@ -57,6 +46,7 @@ public class EnemyAI : MonoBehaviour
                         {
                             new ActionNode(CheckEnemyInDetectionRange),
                             new ActionNode(Chase),
+
                             new SequenceNode
                             (
                                 new List<INode>()
@@ -69,11 +59,7 @@ public class EnemyAI : MonoBehaviour
                                             new ActionNode(Attack)
                                         }
                                     ),
-
-                                    new ActionNode(CheckPatternTime)
                                 }
-
-
                             )
                         }
                     ),
@@ -147,31 +133,86 @@ public class EnemyAI : MonoBehaviour
         return INode.NodeState.Running;
     }
 
-    INode.NodeState CheckPatternTime()
+    INode.NodeState CheckBombPattern()
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        _patternTime += Time.deltaTime;
+        _bombPatternTime += Time.deltaTime;
 
-        if(_patternTime >= 3f)
+        if(_bombPatternTime >= 30f)
         {
-            _patternTime = 0;
+            _bombPatternTime = 0;
 
-            StartCoroutine(PatternCoroutine());
+            StartCoroutine(BombCoroutine());
 
-            return INode.NodeState.Success;
+            return INode.NodeState.Running;
         }
 
         return INode.NodeState.Failure;
     }
 
-    private IEnumerator PatternCoroutine()
+    INode.NodeState CheckRushPattern()
     {
-        Debug.Log("패턴 코루틴 시작");
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        _rushPatternTime += Time.deltaTime;
+
+        if(_rushPatternTime >= 3f)
+        {
+            _rushPatternTime = 0;
+
+            StartCoroutine(RushCoroutine());
+
+            return INode.NodeState.Running;
+        }
+
+        return INode.NodeState.Failure;
+    }
+
+    private IEnumerator BombCoroutine()
+    {
+        for(int i = 0; i < bombPoints.Length; i++)
+        {
+            var obj = ObjectPool.GetObject(ObjectPool.instance.bombObjectQueue , ObjectPool.instance.bombObjectPrefab);
+
+            obj.transform.position = bombPoints[i].position;
+
+            var rigidBody = obj.GetComponent<Rigidbody>();
+
+            if(rigidBody != null)
+            {
+                Vector3 force = bombPoints[i].forward * 5f;
+
+                rigidBody.AddForce(force, ForceMode.Impulse);
+            }
+        }
+
+        yield return null;
+    }
+
+    private IEnumerator GatlingCoroutine()
+    {
+        Debug.Log("개틀링 코루틴 시작");
 
         yield return new WaitForSeconds(1f);
 
-        Debug.Log("패턴 코루틴 끝");
+        Debug.Log("개틀링 코루틴 끝");
+    }
+    
+    private IEnumerator RushCoroutine()
+    {
+        Vector3 lastPlayerPosition = FindAnyObjectByType<PlayerController>().transform.position;
+
+        _agent.speed = 10f;
+        _agent.SetDestination(lastPlayerPosition);
+
+        if(_agent.remainingDistance < 1f)
+        {
+            _agent.speed = 3.5f;
+            _agent.SetDestination(_target.position);
+
+            yield return null;
+        }    
     }
 
 

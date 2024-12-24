@@ -9,23 +9,27 @@ using UnityEngine.Timeline;
 public class ObjectPool : Singletone<ObjectPool>
 {
     [SerializeField]
-    private GameObject poolingObjectPrefab;
+    public GameObject bulletObjectPrefab;
 
-    Queue<GameObject> poolingObjectQueue = new Queue<GameObject>();
+    [SerializeField]
+    public GameObject bombObjectPrefab;
+
+    public Queue<GameObject> bulletObjectQueue = new Queue<GameObject>();
+    public Queue<GameObject> bombObjectQueue = new Queue<GameObject>();
 
 
     private void Start()
     {
-        InitializeObjects(10, poolingObjectPrefab);
+        InitializeObjects(10, bulletObjectQueue, bulletObjectPrefab);
+
+        InitializeObjects(4, bombObjectQueue, bombObjectPrefab);
     }
 
-    private void InitializeObjects(int count, GameObject obj)
+    private void InitializeObjects(int count, Queue<GameObject> queue, GameObject obj)
     {
         for(int i = 0; i < count; i++)
         {
-            poolingObjectQueue.Enqueue(CreateObject(obj));
-
-            Debug.Log(poolingObjectQueue.Count);
+            queue.Enqueue(CreateObject(obj));
         }
     }
 
@@ -38,11 +42,11 @@ public class ObjectPool : Singletone<ObjectPool>
         return _newObj;
     }
 
-    public static GameObject GetObject()
+    public static GameObject GetObject(Queue<GameObject> queue,GameObject obj)
     {
-        if(instance.poolingObjectQueue.Count > 0)
+        if(queue.Count > 0)
         {
-            var _obj = instance.poolingObjectQueue.Dequeue();
+            var _obj = queue.Dequeue();
             _obj.transform.SetParent(null);
             _obj.SetActive(true);
 
@@ -50,7 +54,7 @@ public class ObjectPool : Singletone<ObjectPool>
         }
         else
         {
-            var _newObj = instance.CreateObject(instance.poolingObjectPrefab);
+            var _newObj = instance.CreateObject(obj);
             _newObj.transform.SetParent(null);
             _newObj.SetActive(true);
 
@@ -62,6 +66,6 @@ public class ObjectPool : Singletone<ObjectPool>
     {
         obj.gameObject.SetActive(false);
         obj.transform.SetParent(instance.transform);
-        instance.poolingObjectQueue.Enqueue(obj);
+        instance.bulletObjectQueue.Enqueue(obj);
     }
 }
