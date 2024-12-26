@@ -7,6 +7,7 @@ public class EnemyAI : MonoBehaviour
 {
     private float _detectionRange = 25;
     private float _attackRange = 3;
+    private float _moveSpeed = 2f;
 
     private NavMeshAgent _agent;
 
@@ -16,8 +17,17 @@ public class EnemyAI : MonoBehaviour
 
     InitBehaviorTree _initBehaviorTree;
 
-    private float _bombPatternTime = 0.0f;
-    private float _rushPatternTime = 0.0f;
+    public float _bombPatternTime = 5f;
+    public float _currentbombPatternTime = 5f;
+
+    public bool _isRush = false;
+
+    public float _rushPatternTime = 10f;
+
+    public float _currentRushPatternTime = 10f;
+
+    private float _rushDistance = 20f;
+    public float _remainDistance;
 
     public Transform[] bombPoints;
 
@@ -46,24 +56,18 @@ public class EnemyAI : MonoBehaviour
                         {
                             new ActionNode(CheckEnemyInDetectionRange),
                             new ActionNode(Chase),
-
-                            new SequenceNode
-                            (
-                                new List<INode>()
-                                {
-                                    new SequenceNode
-                                    (
-                                        new List<INode>()
-                                        {
-                                            new ActionNode(CheckEnemyInAttackRange),
-                                            new ActionNode(Attack)
-                                        }
-                                    ),
-                                }
-                            )
-                        }
+                            new ActionNode(CheckRushPattern),
+                        }                      
                     ),
 
+                    
+                    new SequenceNode
+                    (
+                        new List<INode>()
+                        {
+                            //new ActionNode(CheckEnemyInAttackRange),
+                        }
+                    )
                 }
             ); ;
     }
@@ -115,33 +119,43 @@ public class EnemyAI : MonoBehaviour
         {
             _agent.speed = 0f;
 
-            Debug.Log("추적 종료");
-
             return INode.NodeState.Success;
+        }
+        else
+        {
+            if(!_isRush)
+            {
+                _agent.speed = _moveSpeed;
+            }
         }
 
         if(_target == null)
         {
             return INode.NodeState.Failure;
         }
+        else
+        {
+            if(!_isRush)
+            {
+                transform.LookAt(new Vector3(_target.position.x, transform.position.y, _target.position.z));
 
-        transform.LookAt(new Vector3(_target.position.x, transform.position.y, _target.position.z));
+                _agent.destination = _target.position;
+            }
 
-        _agent.destination = _target.position;
-        _agent.speed = 2f;
-
-        return INode.NodeState.Running;
+            return INode.NodeState.Success;
+        }
     }
 
     INode.NodeState CheckBombPattern()
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        _bombPatternTime += Time.deltaTime;
 
-        if(_bombPatternTime >= 30f)
+        _currentbombPatternTime += Time.deltaTime;
+
+        if(_currentbombPatternTime >= _bombPatternTime)
         {
-            _bombPatternTime = 0;
+            _currentbombPatternTime = 0;
 
             StartCoroutine(BombCoroutine());
 
@@ -151,35 +165,17 @@ public class EnemyAI : MonoBehaviour
         return INode.NodeState.Failure;
     }
 
-    INode.NodeState CheckRushPattern()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-        _rushPatternTime += Time.deltaTime;
-
-        if(_rushPatternTime >= 3f)
-        {
-            _rushPatternTime = 0;
-
-            StartCoroutine(RushCoroutine());
-
-            return INode.NodeState.Running;
-        }
-
-        return INode.NodeState.Failure;
-    }
-
     private IEnumerator BombCoroutine()
     {
-        for(int i = 0; i < bombPoints.Length; i++)
+        for (int i = 0; i < bombPoints.Length; i++)
         {
-            var obj = ObjectPool.GetObject(ObjectPool.instance.bombObjectQueue , ObjectPool.instance.bombObjectPrefab);
+            var obj = ObjectPool.GetObject(ObjectPool.instance.bombObjectQueue, ObjectPool.instance.bombObjectPrefab);
 
             obj.transform.position = bombPoints[i].position;
 
             var rigidBody = obj.GetComponent<Rigidbody>();
 
-            if(rigidBody != null)
+            if (rigidBody != null)
             {
                 Vector3 force = bombPoints[i].forward * 5f;
 
@@ -190,6 +186,58 @@ public class EnemyAI : MonoBehaviour
         yield return null;
     }
 
+    INode.NodeState CheckRushPattern()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        _remainDistance = _agent.remainingDistance;
+
+        if (_agent.remainingDistance < _rushDistance)
+        {
+            if (!_isRush)
+            {
+                _currentRushPatternTime += Time.deltaTime;
+            }
+
+            if (_currentRushPatternTime >= _rushPatternTime)
+            {
+                StartCoroutine(RushCoroutine());
+            }
+        }
+
+        return INode.NodeState.Success;
+    }
+
+    private IEnumerator RushCoroutine()
+    {
+        Debug.Log("돌진 패턴 시작");
+
+        _currentRushPatternTime = 0f;
+
+        _isRush = true;
+
+        Vector3 lastPlayerPosition = FindAnyObjectByType<PlayerController>().transform.position;
+
+        _agent.speed = _moveSpeed * 5;
+        _agent.SetDestination(lastPlayerPosition);
+
+        
+        yield return new WaitUntil(() => _remainDistance <= 1f);
+
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("돌진 패턴 끝");
+
+        _agent.speed = _moveSpeed;
+        _agent.SetDestination(_target.position);
+
+        _isRush = false;
+
+        yield return null;
+    }
+
+   
+
     private IEnumerator GatlingCoroutine()
     {
         Debug.Log("개틀링 코루틴 시작");
@@ -199,21 +247,7 @@ public class EnemyAI : MonoBehaviour
         Debug.Log("개틀링 코루틴 끝");
     }
     
-    private IEnumerator RushCoroutine()
-    {
-        Vector3 lastPlayerPosition = FindAnyObjectByType<PlayerController>().transform.position;
 
-        _agent.speed = 10f;
-        _agent.SetDestination(lastPlayerPosition);
-
-        if(_agent.remainingDistance < 1f)
-        {
-            _agent.speed = 3.5f;
-            _agent.SetDestination(_target.position);
-
-            yield return null;
-        }    
-    }
 
 
 

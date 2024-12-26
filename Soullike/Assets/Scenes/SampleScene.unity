@@ -257,7 +257,7 @@ PrefabInstance:
     - target: {fileID: 143893656487638433, guid: 44b16daf187c2764d99e394354299024,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -18.79
+      value: -16.8
       objectReference: {fileID: 0}
     - target: {fileID: 143893656487638433, guid: 44b16daf187c2764d99e394354299024,
         type: 3}
@@ -341,7 +341,7 @@ Transform:
   m_GameObject: {fileID: 165201709}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6, z: -21.79}
+  m_LocalPosition: {x: 0, y: 1.6, z: -19.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -581,7 +581,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6, z: -21.79}
+  m_LocalPosition: {x: 0, y: 1.6, z: -19.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1230,6 +1230,10 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
+  _bombPatternTime: 5
+  _currentbombPatternTime: 4
+  _rushPatternTime: 10
+  _currentRushPatternTime: 9
   bombPoints:
   - {fileID: 1889002892}
   - {fileID: 66094522}
