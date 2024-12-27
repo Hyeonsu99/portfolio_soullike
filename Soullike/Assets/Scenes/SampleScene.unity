@@ -1213,7 +1213,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1033819696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1231,9 +1231,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _bombPatternTime: 5
-  _currentbombPatternTime: 4
+  _currentbombPatternTime: 0
+  _isRush: 0
+  _isBomb: 0
   _rushPatternTime: 10
-  _currentRushPatternTime: 9
+  _currentRushPatternTime: 0
+  _remainDistance: 0
   bombPoints:
   - {fileID: 1889002892}
   - {fileID: 66094522}
@@ -1636,9 +1639,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 244d260b27356704b9ac40e3a596c5f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletObjectPrefab: {fileID: 7488927578596224452, guid: da8a5810fc283c247bfea08134afcaa2,
+  bulletObjectPrefab: {fileID: 3032952169286320492, guid: 97c3ad71eef2ebb48b2e028dabf451a0,
     type: 3}
-  bombObjectPrefab: {fileID: 855319726245005676, guid: d2c53f83902ce85459fed50906036a7f,
+  bombObjectPrefab: {fileID: 6940049495103041102, guid: 54f036c7bc80e574ab3b571abde48c46,
     type: 3}
 --- !u!4 &1351772596
 Transform:
@@ -1649,7 +1652,7 @@ Transform:
   m_GameObject: {fileID: 1351772594}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.2640753, y: -0.85850257, z: 9.911173}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

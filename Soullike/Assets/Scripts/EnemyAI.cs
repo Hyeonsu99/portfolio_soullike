@@ -5,8 +5,8 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    private float _detectionRange = 25;
-    private float _attackRange = 3;
+    private float _detectionRange = 30;
+    private float _attackRange = 25;
     private float _moveSpeed = 2f;
 
     private NavMeshAgent _agent;
@@ -18,15 +18,15 @@ public class EnemyAI : MonoBehaviour
     InitBehaviorTree _initBehaviorTree;
 
     public float _bombPatternTime = 5f;
-    public float _currentbombPatternTime = 5f;
+    public float _currentbombPatternTime = 0f;
 
     public bool _isRush = false;
+    public bool _isBomb = false;
 
     public float _rushPatternTime = 10f;
+    public float _currentRushPatternTime = 0f;
 
-    public float _currentRushPatternTime = 10f;
-
-    private float _rushDistance = 20f;
+    private float _rushDistance = 30f;
     public float _remainDistance;
 
     public Transform[] bombPoints;
@@ -36,6 +36,7 @@ public class EnemyAI : MonoBehaviour
         _initBehaviorTree = new InitBehaviorTree(SettingBT());
 
         _agent = GetComponent<NavMeshAgent>();
+        _agent.speed = _moveSpeed;
     }
 
     // Update is called once per frame
@@ -55,17 +56,32 @@ public class EnemyAI : MonoBehaviour
                         new List<INode>()
                         {
                             new ActionNode(CheckEnemyInDetectionRange),
-                            new ActionNode(Chase),
-                            new ActionNode(CheckRushPattern),
+
+                            new ParallelNode
+                            (
+                                new List<INode>()
+                                {
+                                    new SequenceNode
+                                    (
+                                        new List<INode>()
+                                        {
+                                            new ActionNode(CheckEnemyInAttackRange),
+                                            new ActionNode(CheckRushPattern),
+                                            new ActionNode(CheckBombPattern),
+                                        }
+                                    ),
+
+                                    new ActionNode(Chase)
+                                }
+                            )
                         }                      
                     ),
 
-                    
                     new SequenceNode
                     (
                         new List<INode>()
                         {
-                            //new ActionNode(CheckEnemyInAttackRange),
+                            new ActionNode(Action1)
                         }
                     )
                 }
@@ -104,32 +120,11 @@ public class EnemyAI : MonoBehaviour
         return INode.NodeState.Failure;
     }
 
-    INode.NodeState Attack()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-        return INode.NodeState.Success;
-    }
-
     INode.NodeState Chase()
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        if (Vector3.Distance(transform.position, _target.position) <= _attackRange)
-        {
-            _agent.speed = 0f;
-
-            return INode.NodeState.Success;
-        }
-        else
-        {
-            if(!_isRush)
-            {
-                _agent.speed = _moveSpeed;
-            }
-        }
-
-        if(_target == null)
+        if (_target == null)
         {
             return INode.NodeState.Failure;
         }
@@ -150,16 +145,18 @@ public class EnemyAI : MonoBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-
-        _currentbombPatternTime += Time.deltaTime;
-
-        if(_currentbombPatternTime >= _bombPatternTime)
+        if(!_isRush)
         {
-            _currentbombPatternTime = 0;
+            _currentbombPatternTime += Time.deltaTime;
 
-            StartCoroutine(BombCoroutine());
+            if (_currentbombPatternTime >= _bombPatternTime)
+            {
+                _currentbombPatternTime = 0;
 
-            return INode.NodeState.Running;
+                StartCoroutine(BombCoroutine());
+
+                return INode.NodeState.Success;
+            }
         }
 
         return INode.NodeState.Failure;
@@ -167,6 +164,12 @@ public class EnemyAI : MonoBehaviour
 
     private IEnumerator BombCoroutine()
     {
+        _currentbombPatternTime = 0;
+
+        Debug.Log("폭탄 패턴 시작");
+
+        _agent.speed = 0f;
+
         for (int i = 0; i < bombPoints.Length; i++)
         {
             var obj = ObjectPool.GetObject(ObjectPool.instance.bombObjectQueue, ObjectPool.instance.bombObjectPrefab);
@@ -177,11 +180,15 @@ public class EnemyAI : MonoBehaviour
 
             if (rigidBody != null)
             {
-                Vector3 force = bombPoints[i].forward * 5f;
+                Vector3 force = bombPoints[i].transform.forward * 5f;
 
                 rigidBody.AddForce(force, ForceMode.Impulse);
             }
         }
+
+        yield return new WaitForSeconds(1f);
+
+        _agent.speed = _moveSpeed;
 
         yield return null;
     }
@@ -219,9 +226,10 @@ public class EnemyAI : MonoBehaviour
         Vector3 lastPlayerPosition = FindAnyObjectByType<PlayerController>().transform.position;
 
         _agent.speed = _moveSpeed * 5;
-        _agent.SetDestination(lastPlayerPosition);
 
-        
+        transform.LookAt(lastPlayerPosition);
+        transform.Translate(Vector3.forward * _agent.speed * Time.deltaTime);
+
         yield return new WaitUntil(() => _remainDistance <= 1f);
 
         yield return new WaitForSeconds(1f);
@@ -236,8 +244,6 @@ public class EnemyAI : MonoBehaviour
         yield return null;
     }
 
-   
-
     private IEnumerator GatlingCoroutine()
     {
         Debug.Log("개틀링 코루틴 시작");
@@ -246,10 +252,13 @@ public class EnemyAI : MonoBehaviour
 
         Debug.Log("개틀링 코루틴 끝");
     }
-    
 
+    INode.NodeState Action1()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-
+        return INode.NodeState.Success;
+    }
 
     private void OnDrawGizmos()
     {
