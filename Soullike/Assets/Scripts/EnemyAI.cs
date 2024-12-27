@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +11,7 @@ public class EnemyAI : MonoBehaviour
     private float _moveSpeed = 2f;
 
     private NavMeshAgent _agent;
+    private Animator _animator;
 
     public Transform _target;
 
@@ -36,6 +38,8 @@ public class EnemyAI : MonoBehaviour
         _initBehaviorTree = new InitBehaviorTree(SettingBT());
 
         _agent = GetComponent<NavMeshAgent>();
+        _animator = GetComponentInChildren<Animator>();
+
         _agent.speed = _moveSpeed;
     }
 
@@ -81,7 +85,7 @@ public class EnemyAI : MonoBehaviour
                     (
                         new List<INode>()
                         {
-                            new ActionNode(Action1)
+                            //new ActionNode(CheckEnemyInAttackRange)
                         }
                     )
                 }
@@ -124,6 +128,7 @@ public class EnemyAI : MonoBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
+
         if (_target == null)
         {
             return INode.NodeState.Failure;
@@ -135,6 +140,8 @@ public class EnemyAI : MonoBehaviour
                 transform.LookAt(new Vector3(_target.position.x, transform.position.y, _target.position.z));
 
                 _agent.destination = _target.position;
+
+                _animator.SetBool("isWalk", true);
             }
 
             return INode.NodeState.Success;
@@ -149,7 +156,7 @@ public class EnemyAI : MonoBehaviour
         {
             _currentbombPatternTime += Time.deltaTime;
 
-            if (_currentbombPatternTime >= _bombPatternTime)
+            if (_currentbombPatternTime >= _bombPatternTime && !_isRush)
             {
                 _currentbombPatternTime = 0;
 
@@ -166,9 +173,11 @@ public class EnemyAI : MonoBehaviour
     {
         _currentbombPatternTime = 0;
 
-        Debug.Log("폭탄 패턴 시작");
+        _animator.SetTrigger("Bomb");
 
         _agent.speed = 0f;
+
+        yield return new WaitForSeconds(0.25f);
 
         for (int i = 0; i < bombPoints.Length; i++)
         {
@@ -186,7 +195,7 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.75f);
 
         _agent.speed = _moveSpeed;
 
@@ -208,6 +217,9 @@ public class EnemyAI : MonoBehaviour
 
             if (_currentRushPatternTime >= _rushPatternTime)
             {
+                _currentRushPatternTime = 0f;
+                _currentbombPatternTime = 0f;
+
                 StartCoroutine(RushCoroutine());
             }
         }
@@ -217,11 +229,9 @@ public class EnemyAI : MonoBehaviour
 
     private IEnumerator RushCoroutine()
     {
-        Debug.Log("돌진 패턴 시작");
-
-        _currentRushPatternTime = 0f;
-
         _isRush = true;
+        _animator.SetBool("isWalk", !_isRush);
+        _animator.SetBool("isRush", _isRush);
 
         Vector3 lastPlayerPosition = FindAnyObjectByType<PlayerController>().transform.position;
 
@@ -232,14 +242,17 @@ public class EnemyAI : MonoBehaviour
 
         yield return new WaitUntil(() => _remainDistance <= 1f);
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
 
-        Debug.Log("돌진 패턴 끝");
+        _animator.SetBool("isRush", false);
+
+        yield return new WaitForSeconds(0.8f);
 
         _agent.speed = _moveSpeed;
         _agent.SetDestination(_target.position);
 
         _isRush = false;
+        
 
         yield return null;
     }
