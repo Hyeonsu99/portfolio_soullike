@@ -187,11 +187,17 @@ public class PlayerController : MonoBehaviour
             _freeLookCameraTargetYaw = _aimCameraTargetYaw;
 
             _lastRotation = transform.rotation;
+
+            _animator.SetTrigger("Aiming");
+
+            _animator.SetBool("isAiming", true);
         }
         else
         {
             _freeLookCam.SetActive(true);
             _aimCam.SetActive(false);
+
+            _animator.SetBool("isAiming", false);
         }
     }
 
@@ -247,6 +253,12 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
+        if(!IsAnimationRunning("Shoot"))
+        {
+            _animator.SetTrigger("Shoot");
+        }
+
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
