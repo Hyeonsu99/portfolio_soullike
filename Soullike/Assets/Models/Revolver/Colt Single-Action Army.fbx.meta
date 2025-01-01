@@ -51,7 +51,8 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
+    rigImportErrors: "Invalid Avatar Rig Configuration. Missing or invalid transform:\n\tRequired
+      human bone 'RightUpperLeg' not found\n"
     rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
@@ -59,7 +60,7 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -117,7 +118,132 @@ ModelImporter:
   humanDescription:
     serializedVersion: 3
     human: []
-    skeleton: []
+    skeleton:
+    - name: Colt Single-Action Army(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Light
+      parentName: Colt Single-Action Army(Clone)
+      position: {x: -13.959514, y: -3.4902234, z: 2.3306117}
+      rotation: {x: 0.7821606, y: -0.18956506, z: 0.5898383, w: 0.066186786}
+      scale: {x: 100.00001, y: 99.99999, z: 100.00001}
+    - name: Camera
+      parentName: Colt Single-Action Army(Clone)
+      position: {x: -17.356142, y: -0.28398746, z: 29.05829}
+      rotation: {x: -0.0074663395, y: 0.96456814, z: 0.00011035894, w: 0.26372835}
+      scale: {x: 100.00002, y: 100.000015, z: 100.00001}
+    - name: Cube
+      parentName: Colt Single-Action Army(Clone)
+      position: {x: 1.1220773, y: -0.054345608, z: -0.0000000061321934}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    - name: Armature
+      parentName: Colt Single-Action Army(Clone)
+      position: {x: 2.0321462, y: -0.39957923, z: -0.000000053686993}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
+      scale: {x: 100, y: 100, z: 100}
+    - name: BODY
+      parentName: Armature
+      position: {x: -0.0002766712, y: 6.380248e-10, z: -0.004230301}
+      rotation: {x: 0.697528, y: -0.11599431, z: 0.115994275, w: 0.697528}
+      scale: {x: 1, y: 1, z: 1}
+    - name: HAMMER
+      parentName: BODY
+      position: {x: -0.0037600158, y: 0.012168587, z: 0.0000000019632336}
+      rotation: {x: -0.000000021938437, y: 0.0000001243023, z: -0.29985857, w: 0.95398366}
+      scale: {x: 0.9999999, y: 1, z: 1}
+    - name: HAMMER_end
+      parentName: HAMMER
+      position: {x: -0, y: 0.0062368736, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: CYLINDERCLEAR
+      parentName: BODY
+      position: {x: -0.02272597, y: 0.022577409, z: 0.0012260337}
+      rotation: {x: -0.00000033527613, y: 0.00000005029142, z: 0.9603218, w: 0.27889472}
+      scale: {x: 1, y: 1, z: 1}
+    - name: CYLINDERCLEAR_end
+      parentName: CYLINDERCLEAR
+      position: {x: -0, y: 0.003581972, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: CYLINDER
+      parentName: BODY
+      position: {x: -0.0064655184, y: 0.01658153, z: 0.0000000013077941}
+      rotation: {x: -0.00000005124967, y: 0.00000000976683, z: 0.5815337, w: 0.81352234}
+      scale: {x: 1, y: 0.99999994, z: 1}
+    - name: BULLET6
+      parentName: CYLINDER
+      position: {x: 0.0009558462, y: -0.00000000162155, z: 0.0016950312}
+      rotation: {x: 0.9953962, y: 0.0000006548896, z: 0.00000026808485, w: 0.0958458}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET6_end
+      parentName: BULLET6
+      position: {x: -0, y: 0.003797159, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET1
+      parentName: CYLINDER
+      position: {x: 0.0019371795, y: -0.0000000012181783, z: 1.2020492e-10}
+      rotation: {x: 0.00000013983691, y: 0.00000006087889, z: -0.5336145, w: 0.84572786}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET1_end
+      parentName: BULLET1
+      position: {x: -0, y: 0.003797159, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET4
+      parentName: CYLINDER
+      position: {x: -0.0019499224, y: -0.0000000020290911, z: -1.2099598e-10}
+      rotation: {x: 1.7255277e-14, y: -8.54774e-16, z: 0.000000078485826, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET4_end
+      parentName: BULLET4
+      position: {x: -0, y: 0.003797159, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET3
+      parentName: CYLINDER
+      position: {x: -0.0009813331, y: -0.0000000016298718, z: -0.0016822868}
+      rotation: {x: -1.9802633e-15, y: -1.9569616e-16, z: 0.00000006867509, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET3_end
+      parentName: BULLET3
+      position: {x: -0, y: 0.003797159, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET2
+      parentName: CYLINDER
+      position: {x: 0.00095584645, y: -3.3651693e-11, z: -0.0016822868}
+      rotation: {x: -1.9802635e-15, y: -1.9569659e-16, z: 0.00000006867511, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET2_end
+      parentName: BULLET2
+      position: {x: -0, y: 0.003797159, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET5
+      parentName: CYLINDER
+      position: {x: -0.0009813333, y: -0.0000000020256772, z: 0.0016950312}
+      rotation: {x: -2.2846486e-15, y: -8.5477483e-16, z: 0.00000007848581, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: BULLET5_end
+      parentName: BULLET5
+      position: {x: -0, y: 0.003797159, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: CYLINDERDOOR
+      parentName: BODY
+      position: {x: -0.0054306486, y: 0.013492444, z: 0.0010769055}
+      rotation: {x: 0.09270967, y: -0.015416978, z: -0.16331466, w: 0.9820874}
+      scale: {x: 0.99999994, y: 1, z: 1}
+    - name: CYLINDERDOOR_end
+      parentName: CYLINDERDOOR
+      position: {x: -0, y: 0.004571621, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
@@ -128,13 +254,13 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0

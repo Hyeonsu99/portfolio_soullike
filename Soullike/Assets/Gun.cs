@@ -11,8 +11,33 @@ public class Gun : MonoBehaviour
 
     public Transform firePoint;
 
+    private Animator _animator;
+
+    private PlayerController _playerController;
+
     // Start is called before the first frame update
     void Start()
+    {
+        curMagazine = maxMagazine;
+
+        _animator = GetComponentInChildren<Animator>();
+        
+        _playerController = GetComponentInParent<PlayerController>();
+
+        _playerController.shootEvent += Fire;
+    }
+
+    private void Fire()
+    {
+        if(curMagazine > 0)
+        {
+            curMagazine--;
+
+            _animator.SetTrigger("Shoot");
+        }
+    }
+
+    public void Reload()
     {
         curMagazine = maxMagazine;
     }

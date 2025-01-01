@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+
     private PlayerInputController _inputController;
+
     private Animator _animator;
 
     private Gun _currentGun;
@@ -40,6 +42,11 @@ public class PlayerController : MonoBehaviour
 
     private bool _isReadyCam = false;
 
+    public bool _isReloading = false;
+
+    public delegate void Shoot();
+    public Shoot shootEvent;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,6 +59,8 @@ public class PlayerController : MonoBehaviour
         _inputController = GetComponent<PlayerInputController>();
 
         _animator = GetComponentInChildren<Animator>();
+
+        _currentGun = gunOffset.GetComponentInChildren<Gun>();  
 
         StartCoroutine(SettingCameras());
 
@@ -77,19 +86,45 @@ public class PlayerController : MonoBehaviour
         {
             Move(_inputController.moveInput);
 
-            Aiming();
+            if(!_isReloading)
+            {
+                Aiming();
+            }
+            
         }
 
-        // 차후 총기 추가 및 애니메이션 추가되면 수정
-        if(Input.GetMouseButtonDown(0) && _inputController.isAiming)
+        if(!_isReloading)
         {
-            Fire();
+            // 차후 총기 추가 및 애니메이션 추가되면 수정
+
+            if (Input.GetMouseButtonDown(0) && _inputController.isAiming)
+            {
+                Fire();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Rolling();
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.R) || _currentGun.curMagazine <= 0)
         {
-            Rolling();
+            if(!_isReloading)
+            {
+                _isReloading = true;
+
+                _animator.SetTrigger("Reload");
+
+                if(!IsAnimationRunning("Reload"))
+                {
+                    _isReloading = false;
+
+                    _currentGun.Reload();
+                }
+            }
         }
+
     }
 
     private void LateUpdate()
@@ -260,21 +295,27 @@ public class PlayerController : MonoBehaviour
         if(!IsAnimationRunning("Shoot"))
         {
             _animator.SetTrigger("Shoot");
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
+
+            var obj = ObjectPool.GetObject(ObjectPool.instance.bulletObjectQueue, ObjectPool.instance.bulletObjectPrefab);
+
+            var spawnedBullet = obj.GetComponent<Bullet>();
+
+            spawnedBullet.transform.position = _aimCam.transform.position;
+            spawnedBullet.dir = ray.direction;
+            spawnedBullet.firePoint = _aimCam.transform;
+            spawnedBullet.ReturnBullet();
+
+            shootEvent.Invoke();
         }
+    }
 
+    private void Reload()
+    {
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
-
-        var obj = ObjectPool.GetObject(ObjectPool.instance.bulletObjectQueue , ObjectPool.instance.bulletObjectPrefab);
-
-        var spawnedBullet = obj.GetComponent<Bullet>();
-
-        spawnedBullet.transform.position = _aimCam.transform.position;
-        spawnedBullet.dir = ray.direction;
-        spawnedBullet.firePoint = _aimCam.transform; 
-        spawnedBullet.ReturnBullet();
     }
 
     private void Rolling()
