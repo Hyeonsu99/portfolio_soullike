@@ -8,6 +8,10 @@ public class PlayerController : MonoBehaviour
     private PlayerInputController _inputController;
     private Animator _animator;
 
+    private Gun _currentGun;
+
+    public GameObject gunOffset;
+
     [SerializeField]
     [Range(0f , 20f)]
     private float _moveSpeed = 2.0f;
