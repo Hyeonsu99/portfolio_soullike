@@ -49,9 +49,4 @@ public class Gun : MonoBehaviour
         curMagazine = maxMagazine;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
