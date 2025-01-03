@@ -4,11 +4,15 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Boss_0 : MonoBehaviour
+public class Boss_0 : MonoBehaviour, IDamage
 {
     private float _detectionRange = 30;
     private float _attackRange = 25;
-    private float _moveSpeed = 2f;
+    [Range(0f, 20f)]
+    public float _moveSpeed = 2f;
+    [SerializeField]
+    private float _maxHp = 1000;
+    public float _curHp;
 
     private NavMeshAgent _agent;
     private Animator _animator;
@@ -31,7 +35,7 @@ public class Boss_0 : MonoBehaviour
     private float _rushDistance = 30f;
     public float _remainDistance;
 
-    public Transform[] bombPoints;
+    public Transform[] bombPoints;  
 
     private void Awake()
     {
@@ -41,6 +45,7 @@ public class Boss_0 : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
 
         _agent.speed = _moveSpeed;
+        _curHp = _maxHp;
     }
 
     // Update is called once per frame
@@ -300,5 +305,10 @@ public class Boss_0 : MonoBehaviour
 
         Gizmos.DrawWireSphere(transform.position, _attackRange);
 
+    }
+
+    public void TakeDamage(GameObject attacker, float damage)
+    {
+        _curHp -= damage;
     }
 }

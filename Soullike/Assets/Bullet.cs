@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
 
     public Vector3 dir;
 
+    public float damage;
+
     public const string DESTROY_THIS_NAME = "Destroythis";
 
 
@@ -24,5 +26,15 @@ public class Bullet : MonoBehaviour
     private void Update()
     {
         transform.position += dir * 50f * Time.deltaTime;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.TryGetComponent(out IDamage damage))
+        {
+            damage.TakeDamage(this.gameObject, this.damage);
+        }
+
+        Destroythis();
     }
 }

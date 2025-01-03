@@ -42,6 +42,13 @@ public class Gun : MonoBehaviour
         curMagazine = maxMagazine;
     }
 
+    private IEnumerator Reload(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        curMagazine = maxMagazine;
+    }
+
     // Update is called once per frame
     void Update()
     {

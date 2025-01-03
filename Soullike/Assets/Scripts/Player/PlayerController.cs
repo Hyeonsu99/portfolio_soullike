@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamage
 {
 
     private PlayerInputController _inputController;
@@ -44,6 +44,8 @@ public class PlayerController : MonoBehaviour
 
     public bool _isReloading = false;
 
+    public AnimationClip reloadClip;
+
     public delegate void Shoot();
     public Shoot shootEvent;
 
@@ -82,24 +84,27 @@ public class PlayerController : MonoBehaviour
     {
         _mouseVector = _inputController.mouseInput;
 
-        if(_isReadyCam)
+        if (_isReadyCam)
         {
             Move(_inputController.moveInput);
 
-            if(!_isReloading)
+            if (!_isReloading)
             {
                 Aiming();
             }
-            
+
         }
 
-        if(!_isReloading)
+        if (!_isReloading)
         {
             // 차후 총기 추가 및 애니메이션 추가되면 수정
 
-            if (Input.GetMouseButtonDown(0) && _inputController.isAiming)
+            if (Input.GetMouseButtonDown(0))
             {
-                Fire();
+                if (_inputController.isAiming && _currentGun.curMagazine > 0 && !_isReloading)
+                {
+                    Fire();
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -108,23 +113,10 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.R) || _currentGun.curMagazine <= 0)
+        if (Input.GetKeyDown(KeyCode.R) || _currentGun.curMagazine <= 0)
         {
-            if(!_isReloading)
-            {
-                _isReloading = true;
-
-                _animator.SetTrigger("Reload");
-
-                if(!IsAnimationRunning("Reload"))
-                {
-                    _isReloading = false;
-
-                    _currentGun.Reload();
-                }
-            }
+            Reload();
         }
-
     }
 
     private void LateUpdate()
@@ -191,7 +183,6 @@ public class PlayerController : MonoBehaviour
         }
         else if(_aimCam.activeInHierarchy)
         {
-
             if(moveInput.sqrMagnitude > 0f)
             {
                 Vector3 lookForward = new Vector3(aimCameraTarget.transform.forward.x, 0f, aimCameraTarget.transform.forward.z).normalized;
@@ -201,7 +192,7 @@ public class PlayerController : MonoBehaviour
 
                 Quaternion viewRot = Quaternion.LookRotation(moveDir.normalized);
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
+                //transform.rotation = Quaternion.Lerp(transform.rotation, viewRot, 5f * Time.deltaTime);
 
                 transform.Translate(moveDir * _moveSpeed * 0.5f * Time.deltaTime);
             }
@@ -292,34 +283,54 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
-        if(!IsAnimationRunning("Shoot"))
-        {
-            _animator.SetTrigger("Shoot");
+        _animator.SetTrigger("Shoot");
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
+        Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
 
-            var obj = ObjectPool.GetObject(ObjectPool.instance.bulletObjectQueue, ObjectPool.instance.bulletObjectPrefab);
+        var obj = ObjectPool.GetObject(ObjectPool.instance.bulletObjectQueue, ObjectPool.instance.bulletObjectPrefab);
 
-            var spawnedBullet = obj.GetComponent<Bullet>();
+        var spawnedBullet = obj.GetComponent<Bullet>();
 
-            spawnedBullet.transform.position = _aimCam.transform.position;
-            spawnedBullet.dir = ray.direction;
-            spawnedBullet.firePoint = _aimCam.transform;
-            spawnedBullet.ReturnBullet();
+        spawnedBullet.transform.position = _currentGun.firePoint.transform.position;
+        spawnedBullet.dir = ray.direction;
+        spawnedBullet.firePoint = _currentGun.firePoint.transform;
+        spawnedBullet.damage = _currentGun.damage;
+        spawnedBullet.ReturnBullet();
 
-            shootEvent.Invoke();
-        }
+        shootEvent.Invoke();
     }
 
     private void Reload()
     {
+        if (!_isReloading)
+        {
+            _isReloading = true;
 
+            _animator.SetTrigger("Reload");
+
+            StartCoroutine(ReloadCoroutine());    
+        }
     }
+
+    private IEnumerator ReloadCoroutine()
+    {
+        yield return new WaitForSeconds(reloadClip.length);
+
+        _isReloading = false;
+
+        _currentGun.Reload();
+    }
+
 
     private void Rolling()
     {
 
-    } 
+    }
+
+    public void TakeDamage(GameObject attacker, float damage)
+    {
+        throw new System.NotImplementedException();
+    }
 }

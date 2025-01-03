@@ -541,7 +541,7 @@ MonoBehaviour:
   m_BlendUpdateMethod: 1
   m_DefaultBlend:
     m_Style: 1
-    m_Time: 0.2
+    m_Time: 0.1
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -1564,6 +1564,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boss_0
       objectReference: {fileID: 0}
+    - target: {fileID: 1915745924570227309, guid: f66831821c545fd4bb06dd9fe98c32a4,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5343342428520852575, guid: f66831821c545fd4bb06dd9fe98c32a4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1614,6 +1619,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8653554146049016900, guid: f66831821c545fd4bb06dd9fe98c32a4,
+        type: 3}
+      propertyPath: _moveSpeed
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1632,6 +1642,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4885065602003641239, guid: 44b16daf187c2764d99e394354299024,
+        type: 3}
+      propertyPath: reloadClip
+      value: 
+      objectReference: {fileID: 7400000, guid: 8995bafd7b3d5cc40a2be98293d780ef, type: 2}
     - target: {fileID: 8488744730108814875, guid: 44b16daf187c2764d99e394354299024,
         type: 3}
       propertyPath: m_LocalPosition.x
