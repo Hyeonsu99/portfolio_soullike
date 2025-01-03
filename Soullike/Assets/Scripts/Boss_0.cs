@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyAI : MonoBehaviour
+public class Boss_0 : MonoBehaviour
 {
     private float _detectionRange = 30;
     private float _attackRange = 25;
@@ -92,6 +92,21 @@ public class EnemyAI : MonoBehaviour
             ); ;
     }
 
+    bool IsAnimationRunning(string stateName)
+    {
+        if (_animator != null)
+        {
+            if (_animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
+            {
+                var normalizedTime = _animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+
+                return normalizedTime > 1f && normalizedTime != 0;
+            }
+        }
+
+        return false;
+    }
+
     INode.NodeState CheckEnemyInDetectionRange()
     {
         var targets = Physics.OverlapSphere(transform.position, _detectionRange, layerMask);
@@ -152,7 +167,7 @@ public class EnemyAI : MonoBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-        if(!_isRush)
+        if(!_isRush && !_isBomb)
         {
             _currentbombPatternTime += Time.deltaTime;
 
@@ -171,6 +186,8 @@ public class EnemyAI : MonoBehaviour
 
     private IEnumerator BombCoroutine()
     {
+        _isBomb = true;
+
         _currentbombPatternTime = 0;
 
         _animator.SetTrigger("Bomb");
@@ -195,7 +212,9 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(1.75f);
+        yield return new WaitForSeconds(2f);
+
+        _isBomb = false;
 
         _agent.speed = _moveSpeed;
 
@@ -210,7 +229,7 @@ public class EnemyAI : MonoBehaviour
 
         if (_agent.remainingDistance < _rushDistance)
         {
-            if (!_isRush)
+            if (!_isRush && !_isBomb)
             {
                 _currentRushPatternTime += Time.deltaTime;
             }
