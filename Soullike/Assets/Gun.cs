@@ -1,9 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
+    public enum GunType
+    {
+        Revolver,
+        Rifle
+    }
+
+    public GunType type;    
+
     public int maxMagazine = 6;
     public int curMagazine;
 
@@ -16,15 +25,34 @@ public class Gun : MonoBehaviour
     private PlayerController _playerController;
 
     // Start is called before the first frame update
-    void Start()
+
+
+    private void Awake()
     {
         curMagazine = maxMagazine;
 
         _animator = GetComponentInChildren<Animator>();
-        
+
         _playerController = GetComponentInParent<PlayerController>();
 
+        StartCoroutine(InitCoroutine());
+    }
+
+    IEnumerator InitCoroutine()
+    {
+        yield return new WaitUntil(() => _playerController != null);
+
         _playerController.shootEvent += Fire;
+    }
+
+    private void OnEnable()
+    {
+        _playerController.currentGun = this;
+
+        if (_playerController.animator != null)
+        {
+            _playerController.animator.SetInteger("GunType", (int)type);
+        }
     }
 
     private void Fire()
@@ -48,5 +76,6 @@ public class Gun : MonoBehaviour
 
         curMagazine = maxMagazine;
     }
+
 
 }

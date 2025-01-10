@@ -8,11 +8,9 @@ public class PlayerController : MonoBehaviour, IDamage
 
     private PlayerInputController _inputController;
 
-    private Animator _animator;
+    public Animator animator;
 
-    private Gun _currentGun;
-
-    public GameObject gunOffset;
+    public Gun currentGun;
 
     [SerializeField]
     [Range(0f , 20f)]
@@ -60,9 +58,7 @@ public class PlayerController : MonoBehaviour, IDamage
 
         _inputController = GetComponent<PlayerInputController>();
 
-        _animator = GetComponentInChildren<Animator>();
-
-        _currentGun = gunOffset.GetComponentInChildren<Gun>();  
+        animator = GetComponentInChildren<Animator>();
 
         StartCoroutine(SettingCameras());
 
@@ -101,7 +97,7 @@ public class PlayerController : MonoBehaviour, IDamage
 
             if (Input.GetMouseButtonDown(0))
             {
-                if (_inputController.isAiming && _currentGun.curMagazine > 0 && !_isReloading)
+                if (_inputController.isAiming && currentGun.curMagazine > 0 && !_isReloading)
                 {
                     Fire();
                 }
@@ -113,7 +109,7 @@ public class PlayerController : MonoBehaviour, IDamage
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R) || _currentGun.curMagazine <= 0)
+        if (Input.GetKeyDown(KeyCode.R) || currentGun.curMagazine <= 0)
         {
             Reload();
         }
@@ -137,11 +133,11 @@ public class PlayerController : MonoBehaviour, IDamage
     // 구르기, 공격 등 단발성 애니메이션에 사용
     bool IsAnimationRunning(string stateName)
     {
-        if (_animator != null)
+        if (animator != null)
         {
-            if (_animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
             {
-                var normalizedTime = _animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                var normalizedTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
 
                 return normalizedTime > 1f && normalizedTime != 0;
             }
@@ -218,16 +214,16 @@ public class PlayerController : MonoBehaviour, IDamage
 
             _lastRotation = transform.rotation;
 
-            _animator.SetTrigger("Aiming");
+            animator.SetTrigger("Aiming");
 
-            _animator.SetBool("isAiming", true);
+            animator.SetBool("isAiming", true);
         }
         else
         {
             _freeLookCam.SetActive(true);
             _aimCam.SetActive(false);
 
-            _animator.SetBool("isAiming", false);
+            animator.SetBool("isAiming", false);
         }
     }
 
@@ -283,8 +279,12 @@ public class PlayerController : MonoBehaviour, IDamage
 
     private void Fire()
     {
-        _animator.SetTrigger("Shoot");
+        animator.SetTrigger("Shoot");
 
+    }
+
+    public void SpawnBullet()
+    {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         Debug.DrawRay(aimCameraTarget.transform.position, ray.direction, Color.red, Mathf.Infinity);
@@ -293,10 +293,10 @@ public class PlayerController : MonoBehaviour, IDamage
 
         var spawnedBullet = obj.GetComponent<Bullet>();
 
-        spawnedBullet.transform.position = _currentGun.firePoint.transform.position;
+        spawnedBullet.transform.position = currentGun.firePoint.transform.position;
         spawnedBullet.dir = ray.direction;
-        spawnedBullet.firePoint = _currentGun.firePoint.transform;
-        spawnedBullet.damage = _currentGun.damage;
+        spawnedBullet.firePoint = currentGun.firePoint.transform;
+        spawnedBullet.damage = currentGun.damage;
         spawnedBullet.ReturnBullet();
 
         shootEvent.Invoke();
@@ -308,7 +308,7 @@ public class PlayerController : MonoBehaviour, IDamage
         {
             _isReloading = true;
 
-            _animator.SetTrigger("Reload");
+            animator.SetTrigger("Reload");
 
             StartCoroutine(ReloadCoroutine());    
         }
@@ -320,7 +320,7 @@ public class PlayerController : MonoBehaviour, IDamage
 
         _isReloading = false;
 
-        _currentGun.Reload();
+        currentGun.Reload();
     }
 
 
@@ -331,6 +331,6 @@ public class PlayerController : MonoBehaviour, IDamage
 
     public void TakeDamage(GameObject attacker, float damage)
     {
-        throw new System.NotImplementedException();
+        
     }
 }

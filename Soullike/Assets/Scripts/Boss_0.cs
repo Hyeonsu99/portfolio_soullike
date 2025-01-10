@@ -90,7 +90,7 @@ public class Boss_0 : MonoBehaviour, IDamage
                     (
                         new List<INode>()
                         {
-                            //new ActionNode(CheckEnemyInAttackRange)
+                            new ActionNode(CheckEnemyInAttackRange)
                         }
                     )
                 }
@@ -130,6 +130,8 @@ public class Boss_0 : MonoBehaviour, IDamage
 
     INode.NodeState CheckEnemyInAttackRange()
     {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
         var targets = Physics.OverlapSphere(transform.position, _attackRange, layerMask);
 
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -148,7 +150,6 @@ public class Boss_0 : MonoBehaviour, IDamage
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
 
-
         if (_target == null)
         {
             return INode.NodeState.Failure;
@@ -157,7 +158,7 @@ public class Boss_0 : MonoBehaviour, IDamage
         {
             if(!_isRush)
             {
-                transform.LookAt(new Vector3(_target.position.x, transform.position.y, _target.position.z));
+                transform.LookAt(new Vector3(_target.position.x, 0f, _target.position.z));
 
                 _agent.destination = _target.position;
 
