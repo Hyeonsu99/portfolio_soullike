@@ -20,7 +20,7 @@ public class Gun : MonoBehaviour
 
     public Transform firePoint;
 
-    private Animator _animator;
+    public Animator _animator;
 
     private PlayerController _playerController;
 
@@ -40,19 +40,24 @@ public class Gun : MonoBehaviour
 
     IEnumerator InitCoroutine()
     {
-        yield return new WaitUntil(() => _playerController != null);
-
-        _playerController.shootEvent += Fire;
+        yield return new WaitUntil(() => _playerController != null);   
     }
 
     private void OnEnable()
     {
         _playerController.currentGun = this;
 
+        _playerController.shootEvent += Fire;
+
         if (_playerController.animator != null)
         {
             _playerController.animator.SetInteger("GunType", (int)type);
         }
+    }
+
+    private void OnDisable()
+    {
+        _playerController.shootEvent -= Fire;
     }
 
     private void Fire()
@@ -76,6 +81,4 @@ public class Gun : MonoBehaviour
 
         curMagazine = maxMagazine;
     }
-
-
 }

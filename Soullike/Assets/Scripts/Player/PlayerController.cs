@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour, IDamage
 
     public bool _isReloading = false;
 
-    public AnimationClip reloadClip;
+    public AnimationClip handGunReloadCliip;
 
     public delegate void Shoot();
     public Shoot shootEvent;
@@ -281,6 +281,8 @@ public class PlayerController : MonoBehaviour, IDamage
     {
         animator.SetTrigger("Shoot");
 
+        shootEvent.Invoke();
+
     }
 
     public void SpawnBullet()
@@ -297,9 +299,7 @@ public class PlayerController : MonoBehaviour, IDamage
         spawnedBullet.dir = ray.direction;
         spawnedBullet.firePoint = currentGun.firePoint.transform;
         spawnedBullet.damage = currentGun.damage;
-        spawnedBullet.ReturnBullet();
-
-        shootEvent.Invoke();
+        spawnedBullet.ReturnBullet();   
     }
 
     private void Reload()
@@ -316,7 +316,7 @@ public class PlayerController : MonoBehaviour, IDamage
 
     private IEnumerator ReloadCoroutine()
     {
-        yield return new WaitForSeconds(reloadClip.length);
+        yield return new WaitForSeconds(handGunReloadCliip.length);
 
         _isReloading = false;
 
