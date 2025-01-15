@@ -1252,33 +1252,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730725214}
   m_CullTransparentMesh: 1
---- !u!1 &794836035 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4512198076680339205, guid: 44b16daf187c2764d99e394354299024,
-    type: 3}
-  m_PrefabInstance: {fileID: 6636902284074788455}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &794836037
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 794836035}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,21 +2347,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 3350282060082975445, guid: 44b16daf187c2764d99e394354299024,
+    - target: {fileID: 4885065602003641239, guid: 44b16daf187c2764d99e394354299024,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3350282060082975445, guid: 44b16daf187c2764d99e394354299024,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3350282060082975445, guid: 44b16daf187c2764d99e394354299024,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
+      propertyPath: handGunReloadCliip
+      value: 
+      objectReference: {fileID: 7400000, guid: 8995bafd7b3d5cc40a2be98293d780ef, type: 2}
     - target: {fileID: 8488744730108814875, guid: 44b16daf187c2764d99e394354299024,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2442,11 +2405,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4512198076680339205, guid: 44b16daf187c2764d99e394354299024,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 794836037}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 44b16daf187c2764d99e394354299024, type: 3}
 --- !u!222 &6793329749131637836
 CanvasRenderer:
