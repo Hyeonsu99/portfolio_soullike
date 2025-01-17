@@ -47,6 +47,12 @@ public class PlayerController : MonoBehaviour, IDamage
     public delegate void Shoot();
     public Shoot shootEvent;
 
+    public delegate void HpChange();
+    public HpChange hpChangeEvent;
+
+    public delegate void MagazineChange();
+    public MagazineChange magazineChangeEvent;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -63,6 +69,8 @@ public class PlayerController : MonoBehaviour, IDamage
         StartCoroutine(SettingCameras());
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        magazineChangeEvent.Invoke();
     }
 
     IEnumerator SettingCameras()
@@ -105,7 +113,7 @@ public class PlayerController : MonoBehaviour, IDamage
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                Rolling();
+                
             }
         }
 
@@ -280,9 +288,6 @@ public class PlayerController : MonoBehaviour, IDamage
     private void Fire()
     {
         animator.SetTrigger("Shoot");
-
-        shootEvent.Invoke();
-
     }
 
     public void SpawnBullet()
@@ -299,7 +304,10 @@ public class PlayerController : MonoBehaviour, IDamage
         spawnedBullet.dir = ray.direction;
         spawnedBullet.firePoint = currentGun.firePoint.transform;
         spawnedBullet.damage = currentGun.damage;
-        spawnedBullet.ReturnBullet();   
+        spawnedBullet.ReturnBullet();
+
+        shootEvent.Invoke();
+        magazineChangeEvent.Invoke();
     }
 
     private void Reload()
@@ -321,12 +329,8 @@ public class PlayerController : MonoBehaviour, IDamage
         _isReloading = false;
 
         currentGun.Reload();
-    }
 
-
-    private void Rolling()
-    {
-
+        magazineChangeEvent.Invoke();
     }
 
     public void TakeDamage(GameObject attacker, float damage)

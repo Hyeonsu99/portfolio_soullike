@@ -11,8 +11,8 @@ public class Boss_0 : MonoBehaviour, IDamage
     [Range(0f, 20f)]
     public float _moveSpeed = 2f;
     [SerializeField]
-    private float _maxHp = 1000;
-    public float _curHp;
+    public float maxHp = 1000;
+    public float curHp;
 
     private NavMeshAgent _agent;
     private Animator _animator;
@@ -35,7 +35,10 @@ public class Boss_0 : MonoBehaviour, IDamage
     private float _rushDistance = 30f;
     public float _remainDistance;
 
-    public Transform[] bombPoints;  
+    public Transform[] bombPoints;
+
+    public delegate void HpChange(float hp);
+    public HpChange hpChangeEvent;
 
     private void Awake()
     {
@@ -45,7 +48,9 @@ public class Boss_0 : MonoBehaviour, IDamage
         _animator = GetComponentInChildren<Animator>();
 
         _agent.speed = _moveSpeed;
-        _curHp = _maxHp;
+        curHp = maxHp;
+
+        hpChangeEvent.Invoke(curHp);
     }
 
     // Update is called once per frame
@@ -310,6 +315,8 @@ public class Boss_0 : MonoBehaviour, IDamage
 
     public void TakeDamage(GameObject attacker, float damage)
     {
-        _curHp -= damage;
+        curHp -= damage;
+
+        hpChangeEvent.Invoke(curHp);
     }
 }
